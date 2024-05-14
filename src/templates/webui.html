@@ -1,0 +1,91 @@
+{%extends "base.html"%}
+
+{%block content%}
+<div class="container">
+    <div class="navbar bg-base-100">
+        <div class="flex-1">
+            <a class="btn btn-ghost text-xl">🪞 salamin</a>
+        </div>
+        <div class="flex-none">
+            <button id="theme-switcher" class="btn btn-square btn-ghost">
+                <i id="theme-status" class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </div>
+
+
+    <div class="flex flex-col h-screen flex items-center justify-center gap-5">
+
+        <div class="flex">
+            <div role="alert" id="alert-msg" class="flex alert alert-success">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="alert-text">Your purchase has been confirmed!</span>
+            </div>
+        </div>
+
+        <div id="download-div" class="flex flex-row gap-2">
+            <div class="download">
+                <label class="input input-bordered flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-down w-8 h-4 opacity-70"></i>
+                    <input type="text" id="input-download" class="grow " placeholder="website link of your download" />
+                </label>
+            </div>
+            <div class="download-button">
+                <button type="submit" id="button-download" class="btn btn-active btn-primary">Download</button>
+            </div>
+        </div>
+
+        <div class="download-file">
+            <a id="dl-file" class="btn btn-active btn-success" style="display : none;">Download file</a>
+        </div>
+    </div>
+
+
+</div>
+
+</div>
+
+
+<script>
+    $('#theme-switcher').click(function () {
+        console.log("clicked")
+        // Check current theme
+        if ($('html').attr('data-theme') === 'dark') {
+            // Switch to light theme
+            $('#theme-status').removeClass('fa-moon').addClass('fa-sun')
+            $('html').attr('data-theme', 'bumblebee');
+        } else {
+            // Switch to dark theme
+            $('html').attr('data-theme', 'dark');
+            $('#theme-status').removeClass('fa-sun').addClass('fa-moon')
+        }
+    });
+
+    $('#button-download').click(function () {
+        if ($('#input-download').val() == "") {
+            $('#alert-text').text('Please enter download link before submitting!')
+            $('#alert-msg').removeClass('alert-success').addClass('alert-danger')
+        }
+        else {
+            $.ajax({
+                url: '/download',
+                type: 'POST',
+                data: { download_link: $('#input-download').val() },
+                success: function (respose) {
+                    $('#alert-text').text('Succesfully added to download the: ' + respose.download)
+                    $('#alert-msg').removeClass('alert-error').addClass('alert-success')
+                    $('#dl-file').show().attr('href', respose.download_link)
+                },
+                error: function (respose) {
+                    $('#alert-text').text('Failed to download the ' + respose.download)
+                    $('#alert-msg').removeClass('alert-success').addClass('alert-error')
+                }
+            })
+        }
+    })
+</script>
+{%endblock%}
